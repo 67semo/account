@@ -1,0 +1,4 @@
+data/
+bc_card/
+*.egg-info
+.env
