@@ -250,7 +250,7 @@ def quaterly_report(voucher_df):
 
 if __name__ == "__main__":
     #collector_contactor_info()
-    #fill_business_code()
+    fill_business_code()
     final_xls = os.path.join(data_dir, 'voucher_book_filled.xlsx')
     df = pd.read_excel(final_xls, sheet_name='Sheet1')
     report_df = quaterly_report(df)

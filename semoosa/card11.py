@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 data_dir = os.getenv('data_dir')
+temp_dir = os.getenv('temp_dir')
 organized_file = '카드자료.xlsx'
 contact_obj = '거래처.csv'
 input_file = os.path.join(data_dir, organized_file)
@@ -129,8 +130,8 @@ def handling_data(bc_path):
     contractor_df = pd.concat([contractor_df, pd.DataFrame(contractors)], ignore_index=True)
 
     # 5. CSV로 저장 (선택사항)
-
-    result_df.to_csv('accounting_entries.csv', index=False, encoding='utf-8-sig')
+    temp_file = os.path.join(temp_dir, 'accounting_entries.csv')
+    result_df.to_csv(temp_file, index=False, encoding='utf-8-sig')
 
     '''
     for row_tuple in df.itertuples():

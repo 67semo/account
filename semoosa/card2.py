@@ -1,10 +1,12 @@
+# 카드 다운로드 파일을 초기화
+
 import os, zipfile, io, openpyxl
 import pandas as pd
 from dotenv import load_dotenv
 from typing import Dict, Optional
 
 load_dotenv()
-card_data_dir = os.getenv('card_data_folder')
+card_data_dir = os.getenv('data_dir') + '/25card'
 
 def read_excel_from_zip(zip_file_path):
     """

@@ -49,7 +49,7 @@ rfc3986==2.0.0
 rich==14.0.0
 selenium==4.34.2
 # Editable install with no version control (semoosa==1.0.0)
--e d:\python3\account
+#-e d:\python3\account
 setuptools==80.9.0
 SimpleWebSocketServer==0.1.2
 six==1.17.0

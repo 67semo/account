@@ -17,6 +17,9 @@ def change_to_voucher():
     req_cols = ['날짜','구분', '계정과목', '적요', '거래처', '차변', '대변', '현장명', 'code1/사업자번호', 'name']
     book_df = rough_df[req_cols].copy()
 
+    # 날짜 칼럼을 datetime 형식으로 변환
+    book_df['날짜'] = pd.to_datetime(book_df['날짜'], errors='coerce')
+
     cols = ["차변", "대변"]
     book_df.loc[:, cols] = book_df[cols].replace("",0).fillna(0)
 
