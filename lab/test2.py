@@ -39,14 +39,14 @@ def fill_business_code():
     voucher_df = pd.read_excel(voucher_file, sheet_name='3분기')
 
     # 'code' 열이 비어있는 행만 처리
-    for idx, row in voucher_df[voucher_df['code'].isna()].iterrows():
+    for idx, row in voucher_df[voucher_df['unique_code'].isna()].iterrows():
         search_str = str(row['거래처'])
         # '상호'에 거래처 문자열이 포함된 행 찾기
         matches = contactor_df[contactor_df['상호'].astype(str).str.contains(search_str, na=False, regex=False)]
         if len(matches) == 0:
-            voucher_df.at[idx, 'code'] = 'non'
+            voucher_df.at[idx, 'unique_code'] = 'non'
         elif len(matches) == 1:
-            voucher_df.at[idx, 'code'] = matches.iloc[0]['사업자등록번호']
+            voucher_df.at[idx, 'unique_code'] = matches.iloc[0]['사업자등록번호']
             voucher_df.at[idx, 'name'] = matches.iloc[0]['상호']
             voucher_df.at[idx, '대표'] = matches.iloc[0]['대표자명']
         # 여러개면 아무것도 안함(필요시 else 추가)
@@ -63,8 +63,8 @@ def quaterly_report(voucher_df):
     # ------------------------------------------------------------------
     # 1. 결과 데이터프레임 초기화
     # ------------------------------------------------------------------
-    sales_slip_cols = ['작성날짜', '상호', '사업자등록번호', '대표자', '품명', '공급가액', '부가세', '전표번호']
-    card_purchase_cols = ['카드번호', '승인일자', '합계', '공급가', '부가세', '품명', '사업자번호', '상호', '전표번호']
+    sales_slip_cols = ['작성날짜', '상호', '사업자등록번호', '대표자', '품명', '공급가액', '부가세', '전표번호']        # 매출전표 열
+    card_purchase_cols = ['카드번호', '승인일자', '합계', '공급가', '부가세', '품명', '사업자번호', '상호', '전표번호'] #
     purchase_slip_cols = ['작성날짜', '상호', '사업자등록번호', '대표자', '품명', '공급가액', '부가세', '전표번호']
     general_slip_cols = ['날짜', '상호', '적요', '금액', '전표번호', '증빙']
 
@@ -108,7 +108,7 @@ def quaterly_report(voucher_df):
                 new_slip = {
                     '작성날짜': main_revenue_row['날짜'],
                     '상호': main_revenue_row['name'],
-                    '사업자등록번호': main_revenue_row['code'],
+                    '사업자등록번호': main_revenue_row['unique_code'],
                     '대표자': main_revenue_row['대표'],
                     '품명': main_revenue_row['적요'],
                     '공급가액': supply_amount,
@@ -160,7 +160,7 @@ def quaterly_report(voucher_df):
                     purchase_slip_list.append({
                         '작성날짜': main_expense_row['날짜'],
                         '상호': main_expense_row['name'],
-                        '사업자등록번호': main_expense_row['code'],
+                        '사업자등록번호': main_expense_row['unique_code'],
                         '대표자': main_expense_row['대표'],
                         '품명': main_expense_row['적요'],
                         '공급가액': expense_amount,
@@ -214,7 +214,7 @@ def quaterly_report(voucher_df):
             purchase_slip_list.append({
                 '작성날짜': main_row_for_purchase['날짜'],
                 '상호': main_row_for_purchase['name'],
-                '사업자등록번호': main_row_for_purchase['code'],
+                '사업자등록번호': main_row_for_purchase['unique_code'],
                 '대표자': main_row_for_purchase['대표'],
                 '품명': main_row_for_purchase['적요'],
                 '공급가액': supply_amount, # 큰 값

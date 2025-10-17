@@ -56,7 +56,7 @@ def write_workbook(data):   # 보고서에 기입
 
     # 변경사항 저장
     report_last = os.path.join(data_dir, '잔액보고.xlsx')
-    workbook.save(report_last)
+    workbook.save(report_last )
     print("성공적으로 for 루프를 사용하여 값을 입력했습니다.")
 
 def report_for_director(name, dic_data):

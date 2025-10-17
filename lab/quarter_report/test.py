@@ -4,16 +4,18 @@ import os
 import pandas as pd
 
 load_dotenv()
+dir_path = os.getenv('data_dir')
 
 def change_to_voucher():
     # load draft data
-    book = os.getenv('book')
-    #print(book)
+    fname = '25장부.xlsx'
+    book = os.path.join(dir_path, fname)
+    print(book)
     sheet_nm = "25년장부"
     rough_df = pd.read_excel(book, sheet_name=sheet_nm, header=3)
 
     # slicing required col.
-    req_cols = ['날짜','구분', '계정과목', '적요', '거래처', '차변', '대변', '현장명', 'code1/사업자번호', 'name']
+    req_cols = ['날짜','구분', '계정과목', '적요', '거래처', '차변', '대변', '현장명', 'unique_code', 'name']
     book_df = rough_df[req_cols]
 
     cols = ["차변", "대변"]
@@ -79,6 +81,8 @@ def devide_df(base_df):
     # ----------------------------------------------------
 
     excel_file_name = 'Group_Analysis_Results.xlsx'
+    report_path = os.path.join(dir_path, excel_file_name)
+
 
     # 저장할 DataFrame과 Sheet 이름 정의
     dataframes_to_save = {
@@ -88,7 +92,7 @@ def devide_df(base_df):
     }
 
     try:
-        with pd.ExcelWriter(excel_file_name, engine='xlsxwriter') as writer:
+        with pd.ExcelWriter(report_path, engine='xlsxwriter') as writer:
             for sheet_name, dataframe in dataframes_to_save.items():
                 # 각 DataFrame을 고유한 시트에 저장
                 dataframe.to_excel(writer, sheet_name=sheet_name, index=False)

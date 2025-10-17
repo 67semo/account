@@ -14,7 +14,7 @@ def change_to_voucher():
     rough_df = pd.read_excel(book, sheet_name=sheet_nm, header=3)
 
     # slicing required col.
-    req_cols = ['날짜','구분', '계정과목', '적요', '거래처', '차변', '대변', '현장명', 'code1/사업자번호', 'name']
+    req_cols = ['날짜','구분', '계정과목', '적요', '거래처', '차변', '대변', '현장명', 'unique_code', 'name']
     book_df = rough_df[req_cols].copy()
 
     # 날짜 칼럼을 datetime 형식으로 변환
@@ -101,6 +101,7 @@ def save_to_excel(file_name, sheet_dict):
 
 if __name__ == '__main__':
     req_book = change_to_voucher()
+    print(req_book.head())
     save_to_excel('voucher_book.xlsx', {'3분기': req_book})
     #devide_df(req_book)    # analysis and divide
     #req_book.to_csv('grouped_book.csv', index=False, encoding='utf-8-sig')     # for checking

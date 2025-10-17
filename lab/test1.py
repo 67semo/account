@@ -39,14 +39,14 @@ def fill_business_code():
     voucher_df = pd.read_excel(voucher_file, sheet_name='3분기')
 
     # 'code' 열이 비어있는 행만 처리
-    for idx, row in voucher_df[voucher_df['code'].isna()].iterrows():
+    for idx, row in voucher_df[voucher_df['unique_code'].isna()].iterrows():
         search_str = str(row['거래처'])
         # '상호'에 거래처 문자열이 포함된 행 찾기
         matches = contactor_df[contactor_df['상호'].astype(str).str.contains(search_str, na=False, regex=False)]
         if len(matches) == 0:
-            voucher_df.at[idx, 'code'] = 'non'
+            voucher_df.at[idx, 'unique_code'] = 'non'
         elif len(matches) == 1:
-            voucher_df.at[idx, 'code'] = matches.iloc[0]['사업자등록번호']
+            voucher_df.at[idx, 'unique_code'] = matches.iloc[0]['사업자등록번호']
             voucher_df.at[idx, 'name'] = matches.iloc[0]['상호']
             voucher_df.at[idx, '대표'] = matches.iloc[0]['대표자명']
         # 여러개면 아무것도 안함(필요시 else 추가)
@@ -95,7 +95,7 @@ def quaterly_report(voucher_df):
          sales_slip = pd.concat([sales_slip, pd.DataFrame([{
             '작성날짜': income_row['날짜'],
             '상호': income_row['거래처'],
-            '사업자등록번호': income_row['code'],
+            '사업자등록번호': income_row['unique_code'],
             '대표자': income_row['대표'],
             '품명': income_row['적요'],
             '공급가액': supply_value,
