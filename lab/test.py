@@ -1,4 +1,4 @@
-# 원장의 기록을 가져와 해당클래스를 분류하고 이를 엑셀화일로 출력하는 process
+# 원장의 기록을 가져와 해당클래스를 분류하여 전표번호를 부여하고 이를 엑셀화일로 출력하는 process
 from dotenv import load_dotenv
 import os
 import pandas as pd

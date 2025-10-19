@@ -3,3 +3,4 @@ bc_card/
 temp_storage/
 *.egg-info
 .env
+.venv/

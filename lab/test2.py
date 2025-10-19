@@ -6,6 +6,7 @@ import os
 load_dotenv()
 data_dir = os.getenv('data_dir')
 
+# 홈텍스에서 다운받을 자료를 갖고 거래처들을 수집 
 def collector_contactor_info():
     sales_file = "C:\\Users\\garam\\Downloads\\매출전자세금계산서목록(1~35).xlsx"
     purchase_file = "C:\\Users\\garam\\Downloads\\매입전자세금계산서목록(1~84).xlsx"
@@ -23,13 +24,59 @@ def collector_contactor_info():
     required_cols1 = ['공급받는자사업자등록번호', '상호1', '대표자명1', '주소1', '공급받는자 이메일1']
     contactor_df2 = df1[required_cols1].drop_duplicates().reset_index(drop=True)
 
-    contactor_df1.columns = ['사업자등록번호', '상호', '대표자명', '주소', '이메일']
-    contactor_df2.columns = ['사업자등록번호', '상호', '대표자명', '주소', '이메일']
+    column_names = ['사업자등록번호', '상호', '대표자명', '주소', '이메일']
+    contactor_df1.columns = column_names
+    contactor_df2.columns = column_names
 
     contactor_df = pd.concat([contactor_df1, contactor_df2], ignore_index=True).drop_duplicates().reset_index(drop=True).sort_values(by='사업자등록번호')
     #print(contactor_df)
 
     contactor_df.to_excel(os.path.join(data_dir, 'contactor_list.xlsx'), index=False)
+
+# 비씨카드 자료를 갖고 거래처들을 수집 
+def collector_contactor1_info(mon):
+    card_dr = data_dir + '\\25card'
+    low_file = os.path.join(card_dr, f"{mon}.xlsx")
+    target_file = os.path.join(data_dir, 'contactor_list.xlsx')
+    print(card_dr)
+    df = pd.read_excel(low_file)
+    #print('abd', df.columns)
+
+    required_cols = ['가맹점사업자번호', '가맹점명', '가맹점업종', '가맹점주소1', '가맹점전화번호']
+    contactor_df = df[required_cols].drop_duplicates().reset_index(drop=True)
+    column_names = ['사업자등록번호', '상호', '업종', '주소', '전화번호']
+    contactor_df.columns = column_names
+    contactor_df = contactor_df.drop_duplicates(subset=['사업자등록번호'], keep='last')
+
+    existing_df = pd.read_excel(target_file, sheet_name='거래처')
+
+    merged_df = merge_contactor_info(existing_df, contactor_df)
+    merged_df.to_excel(target_file, sheet_name='거래처', index=False)
+
+
+def merge_contactor_info(df_old, df_new):
+        # '사업자등록번호'를 기준으로 인덱스 설정 (업데이트 및 병합의 기준이 됨)
+    df_old_idx = df_old.set_index('사업자등록번호')
+    df_new_idx = df_new.set_index('사업자등록번호')
+
+    # 1. 기존 데이터프레임 업데이트
+    # df_new의 값이 NaN이 아닌 경우에만 df_old를 덮어씁니다.
+    df_old_idx.update(df_new_idx)
+
+    # 2. 새로운 거래처 (사업자등록번호가 기존에 없던 행) 찾기 및 추가
+    # df_new의 인덱스 중 df_old의 인덱스에 없는 것만 선택합니다.
+    new_accounts_idx = df_new_idx.index.difference(df_old_idx.index)
+
+    # 신규 거래처 데이터프레임 생성
+    df_only_new = df_new_idx.loc[new_accounts_idx]
+
+    # 기존 데이터 (업데이트 완료)와 신규 데이터 합치기
+    df_result = pd.concat([df_old_idx, df_only_new])
+
+    # '사업자등록번호'를 다시 열로 변환
+    df_result = df_result.reset_index()
+
+    return df_result
 
 def fill_business_code():
     contactor_file = os.path.join(data_dir, 'contactor_list.xlsx')
@@ -38,8 +85,8 @@ def fill_business_code():
     voucher_file = os.path.join(data_dir, 'voucher_book.xlsx')
     voucher_df = pd.read_excel(voucher_file, sheet_name='3분기')
 
-    # 'code' 열이 비어있는 행만 처리
-    for idx, row in voucher_df[voucher_df['unique_code'].isna()].iterrows():
+    # 'unique_code' 열이 비어있는 행만 처리
+    for idx, row in voucher_df[(voucher_df['unique_code'].isna()) | (voucher_df['name'].isna())].iterrows():
         search_str = str(row['거래처'])
         # '상호'에 거래처 문자열이 포함된 행 찾기
         matches = contactor_df[contactor_df['상호'].astype(str).str.contains(search_str, na=False, regex=False)]
@@ -144,14 +191,14 @@ def quaterly_report(voucher_df):
                 if not card_check_row.empty:
                     card_row = card_check_row.iloc[0]
                     card_purchase_list.append({
-                        '카드번호': card_row['code'],
+                        '카드번호': card_row['unique_code'],
                         '승인일자': card_row['날짜'],
                         # '합계': '미지급금' 행의 '대변' - '차변'
                         '합계': card_row['대변'] - card_row['차변'],
                         '공급가': expense_amount,
                         '부가세': vat_amount,
                         '품명': main_expense_row['적요'],
-                        '사업자번호': main_expense_row['code'],
+                        '사업자번호': main_expense_row['unique_code'],
                         '상호': main_expense_row['name'],
                         '전표번호': no
                     })
@@ -250,6 +297,8 @@ def quaterly_report(voucher_df):
 
 if __name__ == "__main__":
     #collector_contactor_info()
+    #collector_contactor1_info('09')    # 비씨카드 9월 자료로 거래처 수집
+    
     fill_business_code()
     final_xls = os.path.join(data_dir, 'voucher_book_filled.xlsx')
     df = pd.read_excel(final_xls, sheet_name='Sheet1')
@@ -259,4 +308,3 @@ if __name__ == "__main__":
         report_df[1].to_excel(writer, sheet_name='카드매입', index=False)
         report_df[2].to_excel(writer, sheet_name='매입전표', index=False)
         report_df[3].to_excel(writer, sheet_name='일반전표', index=False)
-
