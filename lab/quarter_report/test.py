@@ -1,4 +1,4 @@
-# 원장의 기록을 가져와 해당클래스를 분류하고 이를 엑셀화일로 출력하는 process
+# 원장의 기록을 가져와 해당클래스를 분류하고 이를 엑셀화일로 출력하는 process, 
 from dotenv import load_dotenv
 import os
 import pandas as pd
@@ -6,6 +6,7 @@ import pandas as pd
 load_dotenv()
 dir_path = os.getenv('data_dir')
 
+# 원장 데이터를 가져와 전표단위로 묶고, 고유번호를 지정한후 반환
 def change_to_voucher():
     # load draft data
     fname = '25장부.xlsx'
@@ -45,6 +46,8 @@ def change_to_voucher():
 
     return req_period_df
 
+
+# 전표단위로 묶인 원장 데이터를 '구분' 기준으로 수익과 비용으로 분류하고, '비용' 그룹을 '부가세' 포함 여부에 따라 나누어 엑셀로 저장
 def devide_df(base_df):
 
     # ----------------------------------------------------
