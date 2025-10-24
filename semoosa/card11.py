@@ -1,7 +1,7 @@
 import os
 
 import pandas as pd
-from semoosa import card
+from semoosa import card, xl_utl as xl
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -124,23 +124,26 @@ def handling_data(bc_path):
         #result_df = pd.concat([result_df, pd.DataFrame(rows)], ignore_index=True)
 
     result_df = pd.DataFrame(collect_rows)
+    empty_cols = ['코드','비고','담당', '작성자', '작성일']
+    for col in empty_cols:
+        result_df[col] = None
+    final_header_order = ['코드', '날짜', '구분', '계정과목', '적요', '거래처', '차변', '대변', '현장명', '비고', '담당',  '작성자', '작성일', 'code1', 'name', 'approve']
+    formatted_df = result_df[final_header_order]
+    formatted_df['날짜'] = pd.to_datetime(formatted_df['날짜'], errors='coerce', format='%Y-%m-%d').dt.date
+
     # 4. 결과 확인
-    print(result_df.head(6))  # 첫 3개 거래(6행) 출력
+    #print(formatted_df.head(6))  # 첫 3개 거래(6행) 출력
 
     contractor_df = pd.concat([contractor_df, pd.DataFrame(contractors)], ignore_index=True)
 
     # 5. CSV로 저장 (선택사항)
-    temp_file = os.path.join(temp_dir, 'accounting_entries.csv')
-    result_df.to_csv(temp_file, index=False, encoding='utf-8-sig')
+    trgt_path = os.path.join(data_dir, '25장부.xlsx')
+    #formatted_df.to_csv(temp_file, index=False, encoding='utf-8-sig')
+    xl.add_df_to_excel(trgt_path, formatted_df, sheet_name='25년장부')
+    print("데이터 추가 성공!")
 
-    '''
-    for row_tuple in df.itertuples():
-        print(row_tuple)
-    df.to_csv('temp.csv', index=False, encoding='utf-8-sig')
-    '''
     from datetime import date
-
-    contractor_df['등록일자'] = contractor_df['등록일자'].fillna(date.today())
+    contractor_df['등록일자'] = contractor_df['등록일자'].fillna(date.today().strftime('%Y-%m-%d'))
     contractor_df.to_csv(cont_file, index=False, encoding='utf-8-sig')
     return True
 

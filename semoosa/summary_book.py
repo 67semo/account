@@ -61,7 +61,8 @@ def write_workbook(data):   # 보고서에 기입
 
 def report_for_director(name, dic_data):
     # 템플릿 파일 열기
-    wb = load_workbook('./data/보고서.xlsx')
+    form1 = os.path.join(format_dir, '보고서.xlsx')
+    wb = load_workbook(form1)
 
     # 원본 시트 복사
     src_sheet = wb['이사정산']
@@ -81,7 +82,8 @@ def report_for_director(name, dic_data):
             active_sheet.cell(row, 5, lst[2*i+1])
 
     # 저장 (기존 템플릿 파일에 적용)
-    f_path = name + '.xlsx'
+    f_name = name + '.xlsx'
+    f_path = os.path.join(data_dir, f_name)
     wb.save(f_path)
     print(f"'{name}' 정산 자료가 저장 되었습니다.")
 
@@ -154,6 +156,6 @@ if __name__ == '__main__':
         mon, day = map(int, date_str.split('/'))
         date_rt = date(cur_year, mon, day)
 
-    #account_for_directors(account_df)   # 이사별정산하여 개별엑셀파일을 현재 디렉토리에 저장
+    account_for_directors(account_df)   # 이사별정산하여 개별엑셀파일을 현재 디렉토리에 저장
     deposit_dic = current_account(account_df, date_rt)  #보통예금 정리
     write_workbook(deposit_dic)  # 보통예금정리하여 장부에 기록
