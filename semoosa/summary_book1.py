@@ -93,34 +93,26 @@ def debit_credit_valence(df):
 def freelancer(df, frate=0.07):  # 프리랜서 현정정리
     df1 = df[(df['구분'] == '부채') & (df['계정과목'] == '선수금')]       # 선수금
     debt_bal = debit_credit_valence(df1)        # 대변 - 차변
-    if debt_bal:                        # 선수금이 있을경우
-        df1 = df[(df['구분'] == '부채') & (df['계정과목'] == '부가세예수금')]   # 부가세예수금
-        debt_surtax = debit_credit_valence(df1)     # 대변 - 차변
-        if debt_bal * 0.1 != debt_surtax:           # 부가세예수금과 선수금의 비율이 맞지않으면 선수금기준으로 부가세예수금처리 --> 이해하지 못할 처리??
-            debt_surtax = debt_bal * 0.1
-    else:
-        debt_surtax = 0                       # 선수금이 없으면, 부가세예수금은 0원
+
+    df1 = df[(df['구분'] == '부채') & (df['계정과목'] == '부가세예수금')]   # 부가세예수금
+    debt_surtax = debit_credit_valence(df1)     # 대변 - 차변
 
     df1 = df[df['구분'] == '수익']             # 수익처리 
     revenue = debit_credit_valence(df1)
-    if revenue:
-        df1 = df[(df['구분'] == '부채') & (df['계정과목'] == '부가세예수금')]   # 부가세예수금과 선수금의 비율이 맞지않으면 선수금기준으로 부가세예수금처리 --> 이해하지 못할 처리??
-        rev_surtax = debit_credit_valence(df1)
-        if revenue * 0.1 != rev_surtax:      # 부가세예수금과 수익의 비율이 맞지않으면 선수금기준으로 부가세예수금처리 --> 이해하지 못할 처리??
-            rev_surtax = revenue * 0.1
-    else:
-        rev_surtax = 0
 
     df1 = df[(df['계정과목'] == '가지급') & (~df['거래처'].isin(['고영수', '대표이사']) )]  # 대표이사를 제외한 가지급 (담당이사의 가지급)
     delector_deposit = debit_credit_valence(df1)
+
     df1 = df[df['구분'] == '비용']           # 비용처리 
     expense = - debit_credit_valence(df1)   
+
     df1 = df[df['계정과목'] == '부가세대급금']  # 부가세대급금
     exp_surtax = - debit_credit_valence(df1)
 
     head_fee = math.ceil((debt_bal+revenue) * frate/10)*10  # 본사 소득
+    
     # 부채(선금), 부채부가세, 수익, 수익부가세, 담당이사 가지급, 0, 비용, 비용부가세, 본사소득, 0
-    items = [debt_bal, debt_surtax, revenue, rev_surtax,delector_deposit, 0, expense, exp_surtax, head_fee,0]
+    items = [debt_bal, debt_surtax, revenue, 0,delector_deposit, 0, expense, exp_surtax, head_fee,0]
     return items
 
 def account_for_directors(ttl_df):

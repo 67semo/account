@@ -85,9 +85,9 @@ class MainWindow(QMainWindow):
         fname = QFileDialog.getOpenFileName(self, '압축 파일 선택', download_path, file_filter)[0]
 
         if fname[0]:
-           card2.card_approval_init(fname, '09')
+           card2.card_approval_init(fname, '10')
 
-        else:
+        else: 
             print("취소됨")
 
 

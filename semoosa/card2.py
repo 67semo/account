@@ -99,14 +99,15 @@ def card_approval_init(zip_pth, month):
         df1 = df1[:-1]
         result_df = df1[~df1[uniq_key].isin(df[uniq_key])].sort_values(['승인일자', '승인시간'])
 
-        #trgt_path = os.path.join(card_data_dir, month + '.csv')                     # target path
-        #result_df.to_csv(trgt_path, index=False, encoding='utf-8-sig')
-
-        trgt_path = os.path.join(card_data_dir, month + '.xlsx')                     # target path
-        print(trgt_path)
+        if result_df.empty:
+            print("신규 승인내역이 없습니다.")
+        else:
+            print(f"신규 승인내역 {result_df.shape[0]}건이 있습니다.")
+            trgt_path = os.path.join(card_data_dir, month + '.xlsx')                     # target path
+            print(trgt_path)
         
-        xl.add_df_to_excel(trgt_path, result_df)
-        print("데이터 추가 성공!")
+            xl.add_df_to_excel(trgt_path, result_df)
+            print("데이터 추가 성공!")
 
     except Exception as e:
         print(f"오류 발생: {e}")
