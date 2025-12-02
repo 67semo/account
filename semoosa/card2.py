@@ -96,7 +96,7 @@ def card_approval_init(zip_pth, month):
         print(f"데이터 형태: {df.shape},{df1.shape}")
 
         uniq_key = '승인번호'
-        df1 = df1[:-1]
+        df1 = df1[:-1]      # 마지막 요약행 제거
         result_df = df1[~df1[uniq_key].isin(df[uniq_key])].sort_values(['승인일자', '승인시간'])
 
         if result_df.empty:
@@ -106,7 +106,7 @@ def card_approval_init(zip_pth, month):
             trgt_path = os.path.join(card_data_dir, month + '.xlsx')                     # target path
             print(trgt_path)
         
-            xl.add_df_to_excel(trgt_path, result_df)
+            xl.add_df_to_excel(trgt_path, result_df)                # 기존 엑셀화일에 신규자료 추가
             print("데이터 추가 성공!")
 
     except Exception as e:
