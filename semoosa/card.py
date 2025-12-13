@@ -93,9 +93,11 @@ def for_semusa_form(filterd_df):  # 세무사양식을 체우기위한 과장
 
 if __name__ == '__main__':
     # --- 사용 예시 ---
-    input_file = './data/카드자료.xlsx' # 실제 Excel 파일 경로로 변경하세요
+    data_dir = os.getenv('data_dir')
+    output_file = os.path.join(data_dir, '세무사양식.xlsx')
+    input_file = os.path.join(data_dir, '카드자료.xlsx')   # './data/카드자료.xlsx' # 실제 Excel 파일 경로로 변경하세요
     column_name = '회계코드'
-    output_file = './data/세무사양식.xlsx'
+    # output_file = './data/세무사양식.xlsx'
     sheet_nm = '카드매입'
     wb = load_workbook(output_file)
     ws = wb[sheet_nm]

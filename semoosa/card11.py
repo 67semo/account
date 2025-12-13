@@ -1,7 +1,7 @@
 import os
 
 import pandas as pd
-from semoosa import card, xl_utl as xl
+from . import card, xl_utl as xl
 from dotenv import load_dotenv
 
 load_dotenv()
