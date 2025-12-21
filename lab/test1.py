@@ -6,21 +6,22 @@ import os
 load_dotenv()
 data_dir = os.getenv('data_dir')
 
-def collector_contactor_info():
-    sales_file = "C:\\Users\\garam\\Downloads\\매출전자세금계산서목록(1~35).xlsx"
-    purchase_file = "C:\\Users\\garam\\Downloads\\매입전자세금계산서목록(1~84).xlsx"
+# 거래처 사업자 정보수집(세금계산서기중)
+def collector_contactor_info(): 
+    sales_file = "C:\\Users\\garam\\Downloads\\매출전자세금계산서목록(1~14).xls"
+    purchase_file = "C:\\Users\\garam\\Downloads\\매입전자세금계산서목록(1~105).xls"
     sheet_nm = "세금계산서"
 
-    df = pd.read_excel(purchase_file, sheet_name=sheet_nm, header=5)
-    #print('abd', df.columns)
+    df = pd.read_excel(purchase_file, sheet_name=sheet_nm, header=5)    #다섯번째 줄부터 입력
+    print('abd', df.columns)
 
-    required_cols = ['공급자사업자등록번호', '상호1', '대표자명1', '주소1', '공급자 이메일']
-    contactor_df1 = df[required_cols].drop_duplicates().reset_index(drop=True)
-
+    required_cols = ['공급자사업자등록번호', '상호.1', '대표자명.1', '주소.1', '공급자 이메일']
+    contactor_df1 = df[required_cols].drop_duplicates().reset_index(drop=True)      # 중복삭제
 
     df1 = pd.read_excel(sales_file, sheet_name=sheet_nm, header=5)
     print('abd', df.columns)
-    required_cols1 = ['공급받는자사업자등록번호', '상호1', '대표자명1', '주소1', '공급받는자 이메일1']
+
+    required_cols1 = ['공급받는자사업자등록번호', '상호.1', '대표자명.1', '주소.1', '공급받는자 이메일1']
     contactor_df2 = df1[required_cols1].drop_duplicates().reset_index(drop=True)
 
     contactor_df1.columns = ['사업자등록번호', '상호', '대표자명', '주소', '이메일']
@@ -29,10 +30,10 @@ def collector_contactor_info():
     contactor_df = pd.concat([contactor_df1, contactor_df2], ignore_index=True).drop_duplicates().reset_index(drop=True).sort_values(by='사업자등록번호')
     #print(contactor_df)
 
-    contactor_df.to_excel(os.path.join(data_dir, 'contactor_list.xlsx'), index=False)
+    #contactor_df.to_excel(os.path.join(data_dir, 'contactor_list.xlsx'), index=False)  # 현 세금계산서에서 추출한 업체만 저장
 
 def fill_business_code():
-    contactor_file = os.path.join(data_dir, 'contactor_list.xlsx')
+    contactor_file = os.path.join(data_dir, 'contactor_list.xlsx') 
     contactor_df = pd.read_excel(contactor_file, sheet_name='거래처')
     
     voucher_file = os.path.join(data_dir, 'voucher_book.xlsx')
@@ -106,14 +107,12 @@ def quaterly_report(voucher_df):
      skipped_df = pd.DataFrame(skipped)
      return sales_slip, skipped_df
     
-
 if __name__ == "__main__":
-    #collector_contactor_info()
-    fill_business_code()
-    final_xls = os.path.join(data_dir, 'voucher_book_filled.xlsx')
-    df = pd.read_excel(final_xls, sheet_name='Sheet1')
-    report_df, skipped_df = quaterly_report(df)
-    with pd.ExcelWriter(os.path.join(data_dir, '3분기_매출전표.xlsx')) as writer:
-        report_df.to_excel(writer, sheet_name='3분기_매출전표', index=False)
-        skipped_df.to_excel(writer, sheet_name='스킵내역', index=False)
-
+    collector_contactor_info()
+    #fill_business_code()
+    #final_xls = os.path.join(data_dir, 'voucher_book_filled.xlsx')
+    #df = pd.read_excel(final_xls, sheet_name='Sheet1')
+    #report_df, skipped_df = quaterly_report(df)
+    #with pd.ExcelWriter(os.path.join(data_dir, '3분기_매출전표.xlsx')) as writer:
+    #    report_df.to_excel(writer, sheet_name='3분기_매출전표', index=False)
+    #    skipped_df.to_excel(writer, sheet_name='스킵내역', index=False)

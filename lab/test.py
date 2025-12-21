@@ -6,7 +6,7 @@ import pandas as pd
 load_dotenv()
 data_dir = os.getenv('data_dir')
 
-def change_to_voucher():
+def voucher():
     # load draft data
     book = os.path.join(data_dir, '25장부.xlsx')
     #print(book)
@@ -21,7 +21,7 @@ def change_to_voucher():
     book_df['날짜'] = pd.to_datetime(book_df['날짜'], errors='coerce')
 
     cols = ["차변", "대변"]
-    book_df.loc[:, cols] = book_df[cols].replace("",0).fillna(0)
+    book_df.loc[:, cols] = book_df[cols].replace("",0).fillna(0)    # 공백은 0을, 빈값또한 0으로 대체
 
     # 결과를 담을 리스트
     no_list = []
@@ -32,17 +32,17 @@ def change_to_voucher():
     # 차변 - 대변 계산하면서 누적합
     for debit, credit in zip(book_df["차변"], book_df["대변"]):
         running_sum += (debit - credit)
-        no_list.append(group_no)  # 아직 0이 안 된 구간은 0 표시
+        no_list.append(group_no)  # 아직 0이 안 된 구간은 0 표시, 전표번호리스트
         sum_list.append(running_sum)
 
         if running_sum == 0:
-            group_no += 1  # 그룹 번호 증가
+            group_no += 1  # 그룹 번호 증가, 현재의 마무리된 전표번호
 
 
     # 새로운 열 추가
     book_df["no"] = no_list
     # 유효기간 데이터 추출(3/4분기)
-    req_period_df = book_df[book_df['날짜'].dt.quarter == 3].copy()
+    req_period_df = book_df[book_df['날짜'].dt.quarter == 4].copy()         # 분기입력
     req_period_df['날짜'] = req_period_df['날짜'].dt.strftime('%Y-%m-%d')
 
     return req_period_df
@@ -100,8 +100,8 @@ def save_to_excel(file_name, sheet_dict):
     print(f"DataFrame saved to {excel_path} in sheet '{sheet_name}'")
 
 if __name__ == '__main__':
-    req_book = change_to_voucher()
+    req_book = voucher()        # 장부내용을 전표화(전표번호부여)
     print(req_book.head())
-    save_to_excel('voucher_book.xlsx', {'3분기': req_book})
+    save_to_excel('voucher_book.xlsx', {'4분기': req_book})    # 저장
     #devide_df(req_book)    # analysis and divide
     #req_book.to_csv('grouped_book.csv', index=False, encoding='utf-8-sig')     # for checking
