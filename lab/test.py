@@ -8,7 +8,7 @@ data_dir = os.getenv('data_dir')
 
 def voucher():
     # load draft data
-    book = os.path.join(data_dir, '25장부.xlsx')
+    book = os.path.join(data_dir, '25장부tmp.xlsx')
     #print(book)
     sheet_nm = "25년장부"
     rough_df = pd.read_excel(book, sheet_name=sheet_nm, header=3)
@@ -102,6 +102,7 @@ def save_to_excel(file_name, sheet_dict):
 if __name__ == '__main__':
     req_book = voucher()        # 장부내용을 전표화(전표번호부여)
     print(req_book.head())
-    save_to_excel('voucher_book.xlsx', {'4분기': req_book})    # 저장
+    vo_path = os.path.join(data_dir, 'voucher_book.xlsx')
+    save_to_excel(vo_path, {'4분기': req_book})    # 저장
     #devide_df(req_book)    # analysis and divide
     #req_book.to_csv('grouped_book.csv', index=False, encoding='utf-8-sig')     # for checking
