@@ -8,14 +8,14 @@ data_dir = os.getenv('data_dir')
 
 # 홈텍스에서 다운받을 자료를 갖고 거래처들을 수집 
 def collector_contactor_info():
-    sales_file = "C:\\Users\\garam\\Downloads\\매출전자세금계산서목록(1~35).xlsx"
-    purchase_file = "C:\\Users\\garam\\Downloads\\매입전자세금계산서목록(1~84).xlsx"
+    sales_file = "C:\\Users\\PC\\Downloads\\매출전자세금계산서목록.xls"
+    purchase_file = "C:\\Users\\PC\\Downloads\\매입전자세금계산서목록.xls"
     sheet_nm = "세금계산서"
 
     df = pd.read_excel(purchase_file, sheet_name=sheet_nm, header=5)
     #print('abd', df.columns)
 
-    required_cols = ['공급자사업자등록번호', '상호1', '대표자명1', '주소1', '공급자 이메일']
+    required_cols = ['공급자사업자등록번호', '상호', '대표자명', '주소', '공급자 이메일']
     contactor_df1 = df[required_cols].drop_duplicates().reset_index(drop=True)
 
 
@@ -31,7 +31,7 @@ def collector_contactor_info():
     contactor_df = pd.concat([contactor_df1, contactor_df2], ignore_index=True).drop_duplicates().reset_index(drop=True).sort_values(by='사업자등록번호')
     #print(contactor_df)
 
-    contactor_df.to_excel(os.path.join(data_dir, 'contactor_list.xlsx'), index=False)
+    contactor_df.to_excel(os.path.join(data_dir, 'contactor_list.xlsx'), sheet_name='거래처', index=False)
 
 # 비씨카드 자료를 갖고 거래처들을 수집 
 def collector_contactor1_info(mon):
@@ -55,7 +55,7 @@ def collector_contactor1_info(mon):
 
 
 def merge_contactor_info(df_old, df_new):
-        # '사업자등록번호'를 기준으로 인덱스 설정 (업데이트 및 병합의 기준이 됨)
+    # '사업자등록번호'를 기준으로 인덱스 설정 (업데이트 및 병합의 기준이 됨)
     df_old_idx = df_old.set_index('사업자등록번호')
     df_new_idx = df_new.set_index('사업자등록번호')
 
@@ -83,7 +83,7 @@ def fill_business_code():
     contactor_df = pd.read_excel(contactor_file, sheet_name='거래처')
     
     voucher_file = os.path.join(data_dir, 'voucher_book.xlsx')
-    voucher_df = pd.read_excel(voucher_file, sheet_name='3분기')
+    voucher_df = pd.read_excel(voucher_file, sheet_name='4분기')
 
     # 'unique_code' 열이 비어있는 행만 처리
     for idx, row in voucher_df[(voucher_df['unique_code'].isna()) | (voucher_df['name'].isna())].iterrows():
@@ -296,15 +296,17 @@ def quaterly_report(voucher_df):
     
 
 if __name__ == "__main__":
+    from time import sleep
     #collector_contactor_info()
     #collector_contactor1_info('09')    # 비씨카드 9월 자료로 거래처 수집
-    
+    #sleep(2)  # 파일 생성 대기
     fill_business_code()
     final_xls = os.path.join(data_dir, 'voucher_book_filled.xlsx')
     df = pd.read_excel(final_xls, sheet_name='Sheet1')
     report_df = quaterly_report(df)
-    with pd.ExcelWriter(os.path.join(data_dir, '3분기_매출전표.xlsx')) as writer:
-        report_df[0].to_excel(writer, sheet_name='3분기_매출전표', index=False)
+    with pd.ExcelWriter(os.path.join(data_dir, '4분기_매출전표.xlsx')) as writer:
+        report_df[0].to_excel(writer, sheet_name='4분기_매출전표', index=False)
         report_df[1].to_excel(writer, sheet_name='카드매입', index=False)
         report_df[2].to_excel(writer, sheet_name='매입전표', index=False)
         report_df[3].to_excel(writer, sheet_name='일반전표', index=False)
+    
