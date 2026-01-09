@@ -53,7 +53,6 @@ def collector_contactor1_info(mon):
     merged_df = merge_contactor_info(existing_df, contactor_df)
     merged_df.to_excel(target_file, sheet_name='거래처', index=False)
 
-
 def merge_contactor_info(df_old, df_new):
     # '사업자등록번호'를 기준으로 인덱스 설정 (업데이트 및 병합의 기준이 됨)
     df_old_idx = df_old.set_index('사업자등록번호')
@@ -110,10 +109,10 @@ def quaterly_report(voucher_df):
     # ------------------------------------------------------------------
     # 1. 결과 데이터프레임 초기화
     # ------------------------------------------------------------------
-    sales_slip_cols = ['작성날짜', '상호', '사업자등록번호', '대표자', '품명', '공급가액', '부가세', '전표번호']        # 매출전표 열
-    card_purchase_cols = ['카드번호', '승인일자', '합계', '공급가', '부가세', '품명', '사업자번호', '상호', '전표번호'] #
-    purchase_slip_cols = ['작성날짜', '상호', '사업자등록번호', '대표자', '품명', '공급가액', '부가세', '전표번호']
-    general_slip_cols = ['날짜', '상호', '적요', '금액', '전표번호', '증빙']
+    sales_slip_cols = ['작성날짜', '상호', '사업자등록번호', '대표자', '품명', '공급가액', '부가세', '전표번호']            # 매출전표 열
+    card_purchase_cols = ['카드번호', '승인일자', '합계', '공급가', '부가세', '품명', '사업자번호', '상호', '전표번호']     # 카드매입 열
+    purchase_slip_cols = ['작성날짜', '상호', '사업자등록번호', '대표자', '품명', '공급가액', '부가세', '전표번호']          # 매입전표 열  
+    general_slip_cols = ['날짜', '상호', '적요', '금액', '전표번호', '증빙']                                      # 일반전표 열 
 
     sales_slip_list = []
     card_purchase_list = []
@@ -128,7 +127,7 @@ def quaterly_report(voucher_df):
         print(no)
         # VAT 관련 행 찾기 (전표번호 전체 그룹에서 찾음)
         vat_rows_in_group = group[group['계정과목'].str.contains('부가세', na=False)]
-        
+
         # ------------------------------------------------------------------
         # 2. 수익 그룹 처리 (매출전표)
         # ------------------------------------------------------------------
@@ -183,7 +182,8 @@ def quaterly_report(voucher_df):
                 # 3.1.1. '미지급금' 계정과목 행이 있고 '거래처'가 '카드'로 시작하는 경우 (카드매입)
                 # ERROR FIX: .str.startswith('카드', na=False, case=False) 대신 .str.lower().str.startswith('카드'.lower(), na=False) 사용
                 #card_check_row = group[(group['계정과목'] == '미지급금') & (group['거래처'].str.startswith('카드', na=False))]
-                card_check_row = group[(group['계정과목'] == '미지급금') & (group['거래처'].str.startswith('카드', na=False))]
+                #card_check_row = group[(group['계정과목'] == '미지급금') & (group['거래처'].str.startswith('카드', na=False))]
+                card_check_row = group[(group['계정과목'] == '미지급금') & (group['거래처'].str.contains(r'\d{4}$', na=False))]
                 mi = group[group['계정과목']=='미지급금']
                 ca = group[group['거래처'].str.startswith('카드', na=False)]
                 print(len(mi), len(ca))
@@ -300,13 +300,18 @@ if __name__ == "__main__":
     #collector_contactor_info()
     #collector_contactor1_info('09')    # 비씨카드 9월 자료로 거래처 수집
     #sleep(2)  # 파일 생성 대기
-    fill_business_code()
+
+    #fill_business_code()
+
     final_xls = os.path.join(data_dir, 'voucher_book_filled.xlsx')
     df = pd.read_excel(final_xls, sheet_name='Sheet1')
+   
     report_df = quaterly_report(df)
     with pd.ExcelWriter(os.path.join(data_dir, '4분기_매출전표.xlsx')) as writer:
         report_df[0].to_excel(writer, sheet_name='4분기_매출전표', index=False)
         report_df[1].to_excel(writer, sheet_name='카드매입', index=False)
         report_df[2].to_excel(writer, sheet_name='매입전표', index=False)
         report_df[3].to_excel(writer, sheet_name='일반전표', index=False)
-    
+'''
+
+'''
