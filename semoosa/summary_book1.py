@@ -9,7 +9,7 @@ data_dir = os.getenv('data_dir')
 book_file = '25장부.xlsx'
 book_path = os.path.join(data_dir, book_file) 
 book_sheet = "25년장부"
-format_dir = os.getenv('project') + '/form'  # 포맷파일이 있는 폴더
+format_dir = os.getenv('format')  # 포맷파일이 있는 폴더
 report = os.path.join(format_dir, '보고서.xlsx')
 
 def read_data():    # 장부읽어와 데이터 프레임으로 리턴
