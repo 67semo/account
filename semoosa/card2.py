@@ -111,8 +111,6 @@ def card_approval_init(zip_pth, month):
 
     except Exception as e:
         print(f"오류 발생: {e}")
-        df1.to_csv("d:/error_card_data.csv", index=False)
-
 
 # 사용 예제
 if __name__ == "__main__":
