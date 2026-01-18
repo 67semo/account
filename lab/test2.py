@@ -132,7 +132,7 @@ def quaterly_report(voucher_df):
         # 2. 수익 그룹 처리 (매출전표)
         # ------------------------------------------------------------------
         revenue_rows = group[group['구분'] == '수익']
-        
+        print(revenue_rows)
         if not revenue_rows.empty:
             # 2.1. 제외 조건 확인: '구분'이 '수익'인 행 중 '계정과목'이 '잡이익'인 경우
             is_jabyiik = (revenue_rows['계정과목'] == '잡이익').any()
@@ -143,7 +143,7 @@ def quaterly_report(voucher_df):
                 # 전표에 기입할 주된 수익 정보 행 (가장 첫 번째 수익 행 사용)
                 main_revenue_row = revenue_rows.iloc[0]
                 
-                # '공급가액': '대변' - '차변'
+                # '공급가액': '대변' - '차변'``
                 supply_amount = main_revenue_row['대변'] - main_revenue_row['차변']
                 
                 # '부가세': '부가세' 계정과목 행의 '대변' - '차변' (수익의 경우 부가세는 대변에 기록)
@@ -161,6 +161,7 @@ def quaterly_report(voucher_df):
                     '부가세': vat_amount,
                     '전표번호': no
                 }
+                print(new_slip)
                 sales_slip_list.append(new_slip)
 
         # ------------------------------------------------------------------
@@ -301,7 +302,7 @@ if __name__ == "__main__":
     #collector_contactor1_info('09')    # 비씨카드 9월 자료로 거래처 수집
     #sleep(2)  # 파일 생성 대기
 
-    #fill_business_code()
+    fill_business_code()
 
     final_xls = os.path.join(data_dir, 'voucher_book_filled.xlsx')
     df = pd.read_excel(final_xls, sheet_name='Sheet1')
