@@ -132,7 +132,6 @@ def quaterly_report(voucher_df):
         # 2. 수익 그룹 처리 (매출전표)
         # ------------------------------------------------------------------
         revenue_rows = group[group['구분'] == '수익']
-        print(revenue_rows)
         if not revenue_rows.empty:
             # 2.1. 제외 조건 확인: '구분'이 '수익'인 행 중 '계정과목'이 '잡이익'인 경우
             is_jabyiik = (revenue_rows['계정과목'] == '잡이익').any()
@@ -161,7 +160,6 @@ def quaterly_report(voucher_df):
                     '부가세': vat_amount,
                     '전표번호': no
                 }
-                print(new_slip)
                 sales_slip_list.append(new_slip)
 
         # ------------------------------------------------------------------
@@ -297,22 +295,21 @@ def quaterly_report(voucher_df):
     
 
 if __name__ == "__main__":
-    from time import sleep
-    #collector_contactor_info()
+
+    #collector_contactor_info()     # 세금계산서 목록에서 사업자 정보 수집
     #collector_contactor1_info('09')    # 비씨카드 9월 자료로 거래처 수집
-    #sleep(2)  # 파일 생성 대기
+  
+    # fill_business_code()        # 부가세항목 라인에 사업자등록번호 삽입
 
-    fill_business_code()
 
+    # 보고서 작성 시이퀀스
     final_xls = os.path.join(data_dir, 'voucher_book_filled.xlsx')
     df = pd.read_excel(final_xls, sheet_name='Sheet1')
    
     report_df = quaterly_report(df)
+    print(len(df))
     with pd.ExcelWriter(os.path.join(data_dir, '4분기_매출전표.xlsx')) as writer:
         report_df[0].to_excel(writer, sheet_name='4분기_매출전표', index=False)
         report_df[1].to_excel(writer, sheet_name='카드매입', index=False)
         report_df[2].to_excel(writer, sheet_name='매입전표', index=False)
         report_df[3].to_excel(writer, sheet_name='일반전표', index=False)
-'''
-
-'''
