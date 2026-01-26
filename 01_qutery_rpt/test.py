@@ -8,7 +8,7 @@ data_dir = os.getenv('data_dir')
 
 def voucher():
     # load draft data
-    book = os.path.join(data_dir, '25장부tmp.xlsx')
+    book = os.path.join(data_dir, '26장부.xlsx')
     #print(book)
     sheet_nm = "25년장부"
     rough_df = pd.read_excel(book, sheet_name=sheet_nm, header=3)
@@ -42,7 +42,7 @@ def voucher():
     # 새로운 열 추가
     book_df["no"] = no_list
     # 유효기간 데이터 추출(3/4분기)
-    req_period_df = book_df[book_df['날짜'].dt.quarter == 4].copy()         # 분기입력
+    req_period_df = book_df[book_df['날짜'].dt.quarter == 1].copy()         # 분기입력
     req_period_df['날짜'] = req_period_df['날짜'].dt.strftime('%Y-%m-%d')
 
     return req_period_df
