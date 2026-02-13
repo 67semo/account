@@ -266,10 +266,11 @@ if __name__ == "__main__":
     #collector_contactor_info()     # 세금계산서 목록에서 사업자 정보 수집
     #collector_contactor1_info('09')    # 비씨카드 9월 자료로 거래처 수집
   
-    #fill_business_code()        # 부가세항목 라인에 사업자등록번호 삽입
+    fill_business_code()        # 부가세항목 라인에 사업자등록번호 삽입
 
 
     # 보고서 작성 시이퀀스
+    '''
     final_xls = os.path.join(data_dir, 'voucher_book_filled.xlsx')
     df = pd.read_excel(final_xls, sheet_name='Sheet1')
    
@@ -282,3 +283,5 @@ if __name__ == "__main__":
         report_df[3].to_excel(writer, sheet_name='일반전표', index=False)
         report_df[4].to_excel(writer, sheet_name='기타', index=False)
 
+    '''
+    
