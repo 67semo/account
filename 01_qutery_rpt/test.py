@@ -34,6 +34,7 @@ def voucher():
         running_sum += (debit - credit)
         no_list.append(group_no)  # 아직 0이 안 된 구간은 0 표시, 전표번호리스트
         sum_list.append(running_sum)
+        print(running_sum)
 
         if running_sum == 0:
             group_no += 1  # 그룹 번호 증가, 현재의 마무리된 전표번호
@@ -42,7 +43,7 @@ def voucher():
     # 새로운 열 추가
     book_df["no"] = no_list
     # 유효기간 데이터 추출(3/4분기)
-    req_period_df = book_df[book_df['날짜'].dt.quarter == 4].copy()         # 분기입력
+    req_period_df = book_df[book_df['날짜'].dt.quarter == 1].copy()         # 분기입력
     req_period_df['날짜'] = req_period_df['날짜'].dt.strftime('%Y-%m-%d')
 
     return req_period_df
