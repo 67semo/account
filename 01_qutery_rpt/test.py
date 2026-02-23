@@ -34,6 +34,7 @@ def voucher():
         running_sum += (debit - credit)
         no_list.append(group_no)  # 아직 0이 안 된 구간은 0 표시, 전표번호리스트
         sum_list.append(running_sum)
+        print(running_sum)
 
         if running_sum == 0:
             group_no += 1  # 그룹 번호 증가, 현재의 마무리된 전표번호
